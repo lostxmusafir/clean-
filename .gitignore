@@ -1,0 +1,15 @@
+# Gitignore for DRC Tournaments
+
+# Node modules
+node_modules/
+
+# Electron build output
+dist/
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+thumbs.db
