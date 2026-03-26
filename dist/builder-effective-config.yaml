@@ -1,0 +1,13 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.sportshub.app
+productName: Sports Hub
+win:
+  target: nsis
+  signAndEditExecutable: false
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+files: []
+electronVersion: 28.3.3

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinetic Dashboard | DRC Tournaments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface-container-high": "#141f38",
+        "error-dim": "#d73357",
+        "on-primary": "#39008c",
+        "primary-dim": "#8455ef",
+        "surface-container-lowest": "#000000",
+        "outline": "#6d758c",
+        "surface-bright": "#1f2b49",
+        "secondary-fixed-dim": "#bdbeff",
+        "secondary-fixed": "#cdcdff",
+        "on-surface-variant": "#a3aac4",
+        "on-secondary-fixed": "#160bae",
+        "inverse-surface": "#faf8ff",
+        "on-primary-fixed-variant": "#370086",
+        "surface-variant": "#192540",
+        "on-secondary": "#080079",
+        "on-tertiary-fixed": "#37001d",
+        "primary-container": "#ae8dff",
+        "on-tertiary": "#4b002a",
+        "on-secondary-container": "#ccccff",
+        "primary-fixed": "#ae8dff",
+        "outline-variant": "#40485d",
+        "error-container": "#a70138",
+        "on-primary-fixed": "#000000",
+        "on-error": "#490013",
+        "tertiary": "#ff6daf",
+        "primary": "#ba9eff",
+        "surface-container-low": "#091328",
+        "secondary": "#9093ff",
+        "on-background": "#dee5ff",
+        "surface": "#060e20",
+        "on-secondary-fixed-variant": "#3a3ac8",
+        "on-tertiary-container": "#2f0018",
+        "on-error-container": "#ffb2b9",
+        "tertiary-dim": "#ff67ad",
+        "on-tertiary-fixed-variant": "#740044",
+        "surface-tint": "#ba9eff",
+        "surface-container-highest": "#192540",
+        "inverse-on-surface": "#4d556b",
+        "secondary-container": "#2f2ebe",
+        "tertiary-container": "#fa53a4",
+        "on-surface": "#dee5ff",
+        "background": "#060e20",
+        "primary-fixed-dim": "#a27cff",
+        "tertiary-fixed-dim": "#ff73b1",
+        "on-primary-container": "#2b006e",
+        "error": "#ff6e84",
+        "secondary-dim": "#6063ee",
+        "inverse-primary": "#6e3bd7",
+        "surface-dim": "#060e20",
+        "surface-container": "#0f1930",
+        "tertiary-fixed": "#ff8cbc"
+      },
+      fontFamily: {
+        "headline": ["Manrope"],
+        "body": ["Inter"],
+        "label": ["Inter"]
+      },
+      borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"}
+    }
+  }
+}
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #060e20; color: #dee5ff; }
+.font-manrope { font-family: 'Manrope', sans-serif; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.glass-panel { background: rgba(31, 43, 73, 0.6); backdrop-filter: blur(20px); }
+.gradient-button { background: linear-gradient(135deg, #ba9eff 0%, #8455ef 100%); }
+.text-glow { text-shadow: 0 0 15px rgba(186, 158, 255, 0.4); }
+
+/* Navigation active states */
+.nav-item.active { 
+  background: linear-gradient(to right, rgba(186, 158, 255, 0.2), transparent);
+  border-left: 4px solid #ba9eff;
+  color: white;
+}
+
+/* Section visibility */
+.section { display: none; }
+.section.active { display: block; }
+
+/* Sidebar navigation */
+.nav-item { 
+  display: flex; 
+  align-items: center; 
+  padding: 0.75rem 1rem; 
+  border-radius: 0.75rem; 
+  color: #a3aac4; 
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.nav-item:hover { 
+  color: white; 
+  background: #141f38; 
+  transform: translateX(4px);
+}
+.nav-item .material-symbols-outlined { margin-right: 0.75rem; }
+
+/* Cards */
+.card {
+  background: #141f38;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+.card:hover { background: #192540; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+.btn-primary { background: linear-gradient(135deg, #ba9eff 0%, #8455ef 100%); color: #000; }
+.btn-secondary { background: #192540; color: #dee5ff; border: 1px solid #40485d; }
+.btn-success { background: #10b981; color: white; }
+.btn-danger { background: #ef4444; color: white; }
+.btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+/* Modals */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal.active { display: flex; }
+.modal-content {
+  background: #0f1930;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #40485d;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.modal-header h2 { font-size: 1.5rem; font-weight: 700; }
+.close-btn {
+  background: none;
+  border: none;
+  color: #a3aac4;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+.close-btn:hover { color: white; }
+
+/* Forms */
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #a3aac4; font-size: 0.875rem; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background: #000;
+  border: 1px solid #40485d;
+  border-radius: 0.5rem;
+  color: #dee5ff;
+  font-size: 0.875rem;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: #ba9eff;
+  box-shadow: 0 0 0 2px rgba(186, 158, 255, 0.2);
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+/* Sport badges */
+.sport-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.sport-badge.football { background: #10b981; color: white; }
+.sport-badge.basketball { background: #f59e0b; color: black; }
+.sport-badge.cricket { background: #3b82f6; color: white; }
+.sport-badge.tennis { background: #8b5cf6; color: white; }
+.sport-badge.volleyball { background: #ef4444; color: white; }
+.sport-badge.badminton { background: #ec4899; color: white; }
+.sport-badge.hockey { background: #06b6d4; color: white; }
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.status-badge.scheduled { background: #3b82f6; color: white; }
+.status-badge.live { background: #ef4444; color: white; animation: pulse 2s infinite; }
+.status-badge.completed { background: #10b981; color: white; }
+.status-badge.cancelled { background: #6b7280; color: white; }
+
+/* Match cards */
+.match-card { position: relative; }
+.match-card.live { border-left: 4px solid #ef4444; }
+.match-teams { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.team { text-align: center; flex: 1; }
+.team-name { font-weight: 600; font-size: 1rem; }
+.match-score { 
+  display: flex; 
+  align-items: center; 
+  gap: 0.5rem; 
+  font-size: 2rem; 
+  font-weight: 800;
+  font-family: 'Manrope', sans-serif;
+}
+.score { color: #ba9eff; }
+.score-divider { color: #a3aac4; font-weight: 400; }
+.match-info { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.match-info > div { display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: #a3aac4; }
+.match-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* Player cards, venue cards */
+.player-card .card-title, .venue-card .card-title, .tournament-card .card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+.card-info { margin-bottom: 1rem; }
+.card-info-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.875rem; color: #a3aac4; }
+.card-info-item .material-symbols-outlined { font-size: 1rem; }
+.card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* Score editor */
+.score-editor { text-align: center; }
+.score-teams { display: flex; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 2rem; }
+.score-team { text-align: center; }
+.score-team h4 { margin-bottom: 0.5rem; font-weight: 600; }
+.score-controls { display: flex; align-items: center; gap: 0.5rem; }
+.score-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #192540;
+  color: #dee5ff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.score-btn:hover { background: #ba9eff; color: #000; }
+.score-controls input {
+  width: 3rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: #000;
+  border: 1px solid #40485d;
+  border-radius: 0.5rem;
+  color: #ba9eff;
+  padding: 0.5rem;
+}
+.score-divider { font-size: 1.5rem; color: #a3aac4; }
+
+/* Empty states */
+.empty-state { text-align: center; padding: 3rem; color: #a3aac4; }
+.empty-state .material-symbols-outlined { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+/* Detail view */
+.detail-section { margin-bottom: 1.5rem; }
+.detail-section h3 { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #ba9eff; }
+.detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #192540; }
+.detail-label { color: #a3aac4; font-size: 0.875rem; }
+.detail-value { font-weight: 500; }
+.participants-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.participant-chip { background: #192540; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; }
+
+/* Live match item */
+.live-match-item { display: flex; justify-content: space-between; padding: 0.75rem; background: #000; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+.live-match-teams { font-weight: 500; }
+.live-match-score { color: #ba9eff; font-weight: 700; }
+
+/* Upcoming tournament item */
+.upcoming-tournament-item { padding: 0.75rem; background: #000; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+.upcoming-tournament-name { font-weight: 600; margin-bottom: 0.25rem; }
+.upcoming-tournament-date { font-size: 0.875rem; color: #a3aac4; display: flex; align-items: center; gap: 0.25rem; }
+
+/* Animations */
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+.animate-pulse { animation: pulse 2s infinite; }
+
+/* Tournament grid */
+.tournament-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+.matches-container { display: grid; gap: 1rem; }
+.players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+.venues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+
+/* Section header */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.section-header h2 { font-size: 1.5rem; font-weight: 700; }
+</style>
+</head>
+<body class="overflow-x-hidden">
+
+<!-- Login Page -->
+<div id="login-page" class="fixed inset-0 z-[200] bg-surface flex items-center justify-center">
+  <div class="w-full max-w-md px-8">
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 rounded-2xl gradient-button flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(186,158,255,0.4)]">
+        <span class="material-symbols-outlined text-4xl text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ba9eff] to-[#8455ef] font-manrope mb-2">DRC Tournaments</h1>
+      <p class="text-on-surface-variant text-sm">Admin Center Login</p>
+    </div>
+    
+    <div class="bg-surface-container-high rounded-3xl p-8 shadow-2xl border border-outline-variant/10">
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-id">
+            <span class="material-symbols-outlined text-sm mr-2">person</span>
+            User ID
+          </label>
+          <input type="text" id="login-id" placeholder="Enter your ID" required autocomplete="username"/>
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password">
+            <span class="material-symbols-outlined text-sm mr-2">lock</span>
+            Password
+          </label>
+          <input type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password"/>
+        </div>
+        
+        <div id="login-error" class="hidden mb-4 p-3 bg-error-container/20 border border-error/30 rounded-xl text-error text-sm text-center">
+          <span class="material-symbols-outlined text-sm mr-2">error</span>
+          Invalid ID or Password
+        </div>
+        
+        <button type="submit" class="w-full py-4 gradient-button rounded-xl text-on-primary-fixed font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-transform mt-6">
+          <span class="material-symbols-outlined">login</span>
+          Sign In
+        </button>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-on-surface-variant text-xs">
+          <span class="material-symbols-outlined text-xs mr-1">info</span>
+          Secure Admin Access Only
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main App Container (Hidden until login) -->
+<div id="app-container" class="hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-64 z-50 rounded-r-[1.5rem] bg-[#060e20] flex flex-col py-8 px-4 shadow-[10px_0_30px_rgba(0,0,0,0.3)] font-manrope font-semibold">
+  <div class="mb-10 px-4">
+    <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ba9eff] to-[#8455ef]">DRC Tournaments</span>
+    <p class="text-on-surface-variant text-xs tracking-widest uppercase mt-1">Elite Tier</p>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="nav-item active" href="#" data-section="dashboard">
+      <span class="material-symbols-outlined">dashboard</span>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#" data-section="tournaments">
+      <span class="material-symbols-outlined">emoji_events</span>
+      Tournaments
+    </a>
+    <a class="nav-item" href="#" data-section="matches">
+      <span class="material-symbols-outlined">sports_esports</span>
+      Matches
+    </a>
+    <a class="nav-item" href="#" data-section="players">
+      <span class="material-symbols-outlined">groups</span>
+      Players
+    </a>
+    <a class="nav-item" href="#" data-section="venues">
+      <span class="material-symbols-outlined">stadium</span>
+      Venues
+    </a>
+  </nav>
+  <div class="mt-auto px-4">
+    <button class="w-full py-4 gradient-button rounded-xl text-on-primary-fixed font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-transform" onclick="openTournamentModal()">
+      <span class="material-symbols-outlined">add_circle</span>
+      Create Tournament
+    </button>
+  </div>
+</aside>
+
+<!-- TopAppBar -->
+<header class="fixed top-0 left-64 right-0 z-40 h-20 bg-[#1f2b49]/60 backdrop-blur-xl flex items-center justify-between px-8 shadow-[0_24px_40px_rgba(57,0,140,0.08)]">
+  <div class="flex items-center gap-6">
+    <h1 class="text-xl font-black tracking-tighter text-white uppercase font-manrope">DRC SPORTS</h1>
+    <div class="hidden md:flex items-center bg-surface-container-lowest px-4 py-2 rounded-full border border-outline-variant/20 w-80">
+      <span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
+      <input class="bg-transparent border-none text-sm focus:ring-0 text-on-surface placeholder:text-outline w-full" placeholder="Search..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="p-2 text-on-surface-variant hover:bg-[#192540] hover:text-white transition-colors duration-300 rounded-full relative">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="absolute top-2 right-2 w-2 h-2 bg-tertiary rounded-full"></span>
+    </button>
+    <button class="p-2 text-on-surface-variant hover:bg-[#192540] hover:text-white transition-colors duration-300 rounded-full">
+      <span class="material-symbols-outlined">settings</span>
+    </button>
+    <div class="h-10 w-10 rounded-full overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-[#ba9eff] to-[#8455ef] flex items-center justify-center text-white font-bold text-sm">
+      AD
+    </div>
+    <button onclick="logout()" class="p-2 text-on-surface-variant hover:bg-[#192540] hover:text-white transition-colors duration-300 rounded-full" title="Logout">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="ml-64 pt-24 px-8 pb-12 min-h-screen bg-surface">
+
+<!-- Dashboard Section -->
+<section id="dashboard-section" class="section active">
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="card group relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <span class="material-symbols-outlined text-6xl">emoji_events</span>
+      </div>
+      <p class="text-on-surface-variant text-sm font-medium mb-1">Active Tournaments</p>
+      <h3 class="text-4xl font-extrabold text-white font-manrope tracking-tight mb-4" id="total-tournaments">0</h3>
+      <div class="flex items-center gap-2 text-xs font-semibold text-primary">
+        <span class="material-symbols-outlined text-sm">trending_up</span>
+        <span>All time</span>
+      </div>
+      <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+    </div>
+    <div class="card group relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <span class="material-symbols-outlined text-6xl">groups</span>
+      </div>
+      <p class="text-on-surface-variant text-sm font-medium mb-1">Registered Players</p>
+      <h3 class="text-4xl font-extrabold text-white font-manrope tracking-tight mb-4" id="total-players">0</h3>
+      <div class="flex items-center gap-2 text-xs font-semibold text-tertiary">
+        <span class="material-symbols-outlined text-sm">group_add</span>
+        <span>Total registered</span>
+      </div>
+      <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-tertiary/40 to-transparent"></div>
+    </div>
+    <div class="card group relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <span class="material-symbols-outlined text-6xl">sports_esports</span>
+      </div>
+      <p class="text-on-surface-variant text-sm font-medium mb-1">Active Matches</p>
+      <h3 class="text-4xl font-extrabold text-white font-manrope tracking-tight mb-4" id="active-matches">0</h3>
+      <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+        <span class="material-symbols-outlined text-sm">schedule</span>
+        <span>Currently live</span>
+      </div>
+    </div>
+    <div class="card group relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <span class="material-symbols-outlined text-6xl">stadium</span>
+      </div>
+      <p class="text-on-surface-variant text-sm font-medium mb-1">Active Venues</p>
+      <h3 class="text-4xl font-extrabold text-white font-manrope tracking-tight mb-4" id="total-venues">0</h3>
+      <div class="flex items-center gap-2 text-xs font-semibold text-primary">
+        <span class="material-symbols-outlined text-sm">location_on</span>
+        <span>Total venues</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Live Matches -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold font-manrope flex items-center gap-3">
+          Live Matches
+          <span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary text-[10px] uppercase tracking-widest animate-pulse font-bold">Live</span>
+        </h2>
+        <button class="text-xs font-semibold text-primary hover:underline" onclick="showSection('matches')">View All</button>
+      </div>
+      <div class="space-y-4" id="live-matches-list">
+        <div class="empty-state">
+          <span class="material-symbols-outlined">sports_esports</span>
+          <p>No live matches at the moment</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Tournaments -->
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold font-manrope">Upcoming</h2>
+        <span class="material-symbols-outlined text-on-surface-variant text-lg">calendar_month</span>
+      </div>
+      <div class="space-y-4" id="upcoming-tournaments-list">
+        <div class="empty-state">
+          <span class="material-symbols-outlined">emoji_events</span>
+          <p>No upcoming tournaments</p>
+        </div>
+      </div>
+      <button class="w-full py-3 rounded-xl border border-outline-variant/20 text-on-surface-variant text-sm font-semibold hover:bg-surface-container-high transition-all flex items-center justify-center gap-2" onclick="showSection('tournaments')">
+        Browse More Events
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Tournaments Section -->
+<section id="tournaments-section" class="section">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div class="space-y-2">
+      <h2 class="text-4xl font-extrabold font-manrope tracking-tight text-glow">Tournaments</h2>
+      <p class="text-on-surface-variant">Global arena for the world's most competitive circuits.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openTournamentModal()">
+      <span class="material-symbols-outlined text-sm">add</span> New Tournament
+    </button>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="flex flex-wrap items-center gap-4 mb-8">
+    <div class="bg-surface-container-high px-4 py-2.5 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-surface-container-highest transition-colors">
+      <span class="material-symbols-outlined text-primary text-sm">sports_esports</span>
+      <span class="text-sm font-medium">All Sports</span>
+      <span class="material-symbols-outlined text-on-surface-variant text-xs">keyboard_arrow_down</span>
+    </div>
+    <div class="bg-surface-container-high px-4 py-2.5 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-surface-container-highest transition-colors">
+      <span class="material-symbols-outlined text-primary text-sm">format_list_bulleted</span>
+      <span class="text-sm font-medium">All Formats</span>
+      <span class="material-symbols-outlined text-on-surface-variant text-xs">keyboard_arrow_down</span>
+    </div>
+  </div>
+
+  <div class="tournament-grid" id="tournaments-list">
+    <div class="empty-state">
+      <span class="material-symbols-outlined">emoji_events</span>
+      <p>No tournaments yet. Create your first tournament!</p>
+    </div>
+  </div>
+</section>
+
+<!-- Matches Section -->
+<section id="matches-section" class="section">
+  <div class="section-header">
+    <h2 class="text-xl font-bold font-manrope">Live Matches & Score Management</h2>
+    <button class="btn btn-primary" onclick="openMatchModal()">
+      <span class="material-symbols-outlined text-sm">add</span> New Match
+    </button>
+  </div>
+  <div class="matches-container" id="matches-list">
+    <div class="empty-state">
+      <span class="material-symbols-outlined">sports_esports</span>
+      <p>No matches scheduled. Create your first match!</p>
+    </div>
+  </div>
+</section>
+
+<!-- Players Section -->
+<section id="players-section" class="section">
+  <div class="section-header">
+    <h2 class="text-xl font-bold font-manrope">Players</h2>
+    <button class="btn btn-primary" onclick="openPlayerModal()">
+      <span class="material-symbols-outlined text-sm">person_add</span> Add Player
+    </button>
+  </div>
+  <div class="players-grid" id="players-list">
+    <div class="empty-state">
+      <span class="material-symbols-outlined">groups</span>
+      <p>No players registered. Add your first player!</p>
+    </div>
+  </div>
+</section>
+
+<!-- Venues Section -->
+<section id="venues-section" class="section">
+  <div class="section-header">
+    <h2 class="text-xl font-bold font-manrope">Venues & Locations</h2>
+    <button class="btn btn-primary" onclick="openVenueModal()">
+      <span class="material-symbols-outlined text-sm">add_location</span> Add Venue
+    </button>
+  </div>
+  <div class="venues-grid" id="venues-list">
+    <div class="empty-state">
+      <span class="material-symbols-outlined">stadium</span>
+      <p>No venues added. Add your first venue!</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 w-14 h-14 rounded-2xl gradient-button text-on-primary-fixed shadow-[0_15px_30px_-5px_rgba(132,85,239,0.5)] flex items-center justify-center group active:scale-95 transition-all z-50" onclick="openTournamentModal()">
+  <span class="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
+</button>
+
+<!-- Tournament Modal -->
+<div class="modal" id="tournament-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="tournament-modal-title">Create Tournament</h2>
+      <button class="close-btn" onclick="closeTournamentModal()">&times;</button>
+    </div>
+    <form id="tournament-form">
+      <input type="hidden" id="tournament-id"/>
+      <div class="form-group">
+        <label>Tournament Name *</label>
+        <input type="text" id="tournament-name" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Sport *</label>
+          <select id="tournament-sport" required>
+            <option value="">Select Sport</option>
+            <option value="football">Football</option>
+            <option value="basketball">Basketball</option>
+            <option value="cricket">Cricket</option>
+            <option value="tennis">Tennis</option>
+            <option value="volleyball">Volleyball</option>
+            <option value="badminton">Badminton</option>
+            <option value="hockey">Hockey</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Max Participants</label>
+          <input type="number" id="tournament-max-participants" min="2" value="16"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date *</label>
+          <input type="date" id="tournament-start-date" required/>
+        </div>
+        <div class="form-group">
+          <label>End Date *</label>
+          <input type="date" id="tournament-end-date" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Time</label>
+          <input type="time" id="tournament-start-time"/>
+        </div>
+        <div class="form-group">
+          <label>End Time</label>
+          <input type="time" id="tournament-end-time"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Venue</label>
+        <select id="tournament-venue">
+          <option value="">Select Venue</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="tournament-description" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Rules & Regulations</label>
+        <textarea id="tournament-rules" rows="3"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeTournamentModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Tournament</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Tournament Modal -->
+<div class="modal" id="view-tournament-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Tournament Details</h2>
+      <button class="close-btn" onclick="closeViewTournamentModal()">&times;</button>
+    </div>
+    <div id="tournament-details"></div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeViewTournamentModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Register Tournament Modal -->
+<div class="modal" id="register-tournament-modal">
+  <div class="modal-content modal-sm">
+    <div class="modal-header">
+      <h2>Register Player</h2>
+      <button class="close-btn" onclick="closeRegisterTournamentModal()">&times;</button>
+    </div>
+    <input type="hidden" id="register-tournament-id"/>
+    <div class="form-group">
+      <label>Select Player</label>
+      <select id="register-player-select">
+        <option value="">Choose a player</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeRegisterTournamentModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="registerPlayerForTournament()">Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- Match Modal -->
+<div class="modal" id="match-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="match-modal-title">Create Match</h2>
+      <button class="close-btn" onclick="closeMatchModal()">&times;</button>
+    </div>
+    <form id="match-form">
+      <input type="hidden" id="match-id"/>
+      <div class="form-group">
+        <label>Tournament</label>
+        <select id="match-tournament">
+          <option value="">Select Tournament</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Team 1 *</label>
+          <input type="text" id="match-team1" required/>
+        </div>
+        <div class="form-group">
+          <label>Team 2 *</label>
+          <input type="text" id="match-team2" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Match Date *</label>
+          <input type="date" id="match-date" required/>
+        </div>
+        <div class="form-group">
+          <label>Match Time *</label>
+          <input type="time" id="match-time" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Venue</label>
+        <select id="match-venue">
+          <option value="">Select Venue</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="match-status">
+          <option value="scheduled">Scheduled</option>
+          <option value="live">Live</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeMatchModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Match</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Score Modal -->
+<div class="modal" id="score-modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-header">
+      <h2>Edit Score</h2>
+      <button class="close-btn" onclick="closeScoreModal()">&times;</button>
+    </div>
+    <div class="score-editor">
+      <input type="hidden" id="score-match-id"/>
+      <div class="score-teams">
+        <div class="score-team">
+          <h4 id="score-team1-name">Team 1</h4>
+          <div class="score-controls">
+            <button type="button" class="score-btn" onclick="adjustScore(1, -1)">
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+            <input type="number" id="score-team1" min="0" value="0"/>
+            <button type="button" class="score-btn" onclick="adjustScore(1, 1)">
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+        <div class="score-divider">VS</div>
+        <div class="score-team">
+          <h4 id="score-team2-name">Team 2</h4>
+          <div class="score-controls">
+            <button type="button" class="score-btn" onclick="adjustScore(2, -1)">
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+            <input type="number" id="score-team2" min="0" value="0"/>
+            <button type="button" class="score-btn" onclick="adjustScore(2, 1)">
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Add Event</label>
+        <select id="score-event-type">
+          <option value="">Select Event</option>
+          <option value="goal">Goal</option>
+          <option value="assist">Assist</option>
+          <option value="yellow_card">Yellow Card</option>
+          <option value="red_card">Red Card</option>
+          <option value="foul">Foul</option>
+          <option value="timeout">Timeout</option>
+          <option value="substitution">Substitution</option>
+          <option value="injury">Injury</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Event Team</label>
+        <select id="score-event-team">
+          <option value="1">Team 1</option>
+          <option value="2">Team 2</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Event Description</label>
+        <input type="text" id="score-event-description" placeholder="Player name or details"/>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeScoreModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveScore()">Save Score</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Player Modal -->
+<div class="modal" id="player-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="player-modal-title">Add Player</h2>
+      <button class="close-btn" onclick="closePlayerModal()">&times;</button>
+    </div>
+    <form id="player-form">
+      <input type="hidden" id="player-id"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="player-firstname" required/>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="player-lastname" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="player-email" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="player-phone"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <input type="date" id="player-dob"/>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="player-gender">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sport</label>
+        <select id="player-sport">
+          <option value="">Select Sport</option>
+          <option value="football">Football</option>
+          <option value="basketball">Basketball</option>
+          <option value="cricket">Cricket</option>
+          <option value="tennis">Tennis</option>
+          <option value="volleyball">Volleyball</option>
+          <option value="badminton">Badminton</option>
+          <option value="hockey">Hockey</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Team Name</label>
+        <input type="text" id="player-team"/>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <textarea id="player-address" rows="2"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closePlayerModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Player</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Venue Modal -->
+<div class="modal" id="venue-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="venue-modal-title">Add Venue</h2>
+      <button class="close-btn" onclick="closeVenueModal()">&times;</button>
+    </div>
+    <form id="venue-form">
+      <input type="hidden" id="venue-id"/>
+      <div class="form-group">
+        <label>Venue Name *</label>
+        <input type="text" id="venue-name" required/>
+      </div>
+      <div class="form-group">
+        <label>Address *</label>
+        <input type="text" id="venue-address" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City *</label>
+          <input type="text" id="venue-city" required/>
+        </div>
+        <div class="form-group">
+          <label>State/Province</label>
+          <input type="text" id="venue-state"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Country *</label>
+          <input type="text" id="venue-country" required/>
+        </div>
+        <div class="form-group">
+          <label>Postal Code</label>
+          <input type="text" id="venue-postal"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Capacity</label>
+          <input type="number" id="venue-capacity" min="1"/>
+        </div>
+        <div class="form-group">
+          <label>Venue Type</label>
+          <select id="venue-type">
+            <option value="indoor">Indoor</option>
+            <option value="outdoor">Outdoor</option>
+            <option value="both">Indoor & Outdoor</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Contact Phone</label>
+        <input type="tel" id="venue-phone"/>
+      </div>
+      <div class="form-group">
+        <label>Contact Email</label>
+        <input type="email" id="venue-email"/>
+      </div>
+      <div class="form-group">
+        <label>Facilities</label>
+        <textarea id="venue-facilities" rows="2" placeholder="Parking, Restrooms, Food Court, etc."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="venue-notes" rows="2"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeVenueModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Venue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div><!-- End of app-container -->
+
+<script src="renderer.js"></script>
+</body>
+</html>
