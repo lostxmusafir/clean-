@@ -6,6 +6,7 @@ let players = [];
 let venues = [];
 let matches = [];
 let currentMatchId = null;
+let dataSyncInterval = null;
 
 // Admin credentials
 const ADMIN_ID = 'raj';
@@ -18,7 +19,149 @@ document.addEventListener('DOMContentLoaded', () => {
   initForms();
   updateCurrentTime();
   setInterval(updateCurrentTime, 1000);
+  
+  // Start auto-sync for data changes
+  startDataSync();
 });
+
+// Auto-sync functionality for real-time data updates
+function startDataSync() {
+  if (dataSyncInterval) {
+    clearInterval(dataSyncInterval);
+  }
+  
+  // Sync data every 2 seconds
+  dataSyncInterval = setInterval(async () => {
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+      await syncDataChanges();
+    }
+  }, 2000);
+}
+
+function stopDataSync() {
+  if (dataSyncInterval) {
+    clearInterval(dataSyncInterval);
+    dataSyncInterval = null;
+  }
+}
+
+async function syncDataChanges() {
+  try {
+    // Get current data from backend
+    const backendTournaments = await ipcRenderer.invoke('get-tournaments');
+    const backendPlayers = await ipcRenderer.invoke('get-players');
+    const backendVenues = await ipcRenderer.invoke('get-venues');
+    const backendMatches = await ipcRenderer.invoke('get-matches');
+    
+    // Check for changes and merge
+    const changes = {
+      tournaments: detectChanges(tournaments, backendTournaments),
+      players: detectChanges(players, backendPlayers),
+      venues: detectChanges(venues, backendVenues),
+      matches: detectChanges(matches, backendMatches)
+    };
+    
+    // Apply changes if any detected
+    if (changes.tournaments.hasChanges) {
+      tournaments = backendTournaments;
+      if (document.getElementById('tournaments-section').classList.contains('active')) {
+        loadTournaments();
+        showNotification('Tournament data updated', 'success');
+      }
+    }
+    
+    if (changes.players.hasChanges) {
+      players = backendPlayers;
+      if (document.getElementById('players-section').classList.contains('active')) {
+        loadPlayers();
+        showNotification('Player data updated', 'success');
+      }
+    }
+    
+    if (changes.venues.hasChanges) {
+      venues = backendVenues;
+      if (document.getElementById('venues-section').classList.contains('active')) {
+        loadVenues();
+        showNotification('Venue data updated', 'success');
+      }
+    }
+    
+    if (changes.matches.hasChanges) {
+      matches = backendMatches;
+      if (document.getElementById('matches-section').classList.contains('active')) {
+        loadMatches();
+        showNotification('Match data updated', 'success');
+      }
+    }
+    
+    // Update dashboard if active
+    if (document.getElementById('dashboard-section').classList.contains('active')) {
+      loadDashboard();
+    }
+    
+  } catch (error) {
+    console.warn('Sync error:', error);
+  }
+}
+
+function detectChanges(currentData, backendData) {
+  const currentMap = new Map(currentData.map(item => [item.id, item]));
+  const backendMap = new Map(backendData.map(item => [item.id, item]));
+  
+  let hasChanges = false;
+  let added = [];
+  let updated = [];
+  let deleted = [];
+  
+  // Check for deleted items
+  for (const [id, item] of currentMap) {
+    if (!backendMap.has(id)) {
+      deleted.push(id);
+      hasChanges = true;
+    } else {
+      // Check for updates
+      const backendItem = backendMap.get(id);
+      if (JSON.stringify(item) !== JSON.stringify(backendItem)) {
+        updated.push(backendItem);
+        hasChanges = true;
+      }
+    }
+  }
+  
+  // Check for added items
+  for (const [id, item] of backendMap) {
+    if (!currentMap.has(id)) {
+      added.push(item);
+      hasChanges = true;
+    }
+  }
+  
+  return {
+    hasChanges,
+    added,
+    updated,
+    deleted
+  };
+}
+
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  
+  // Add to notification container
+  const container = document.getElementById('notifications');
+  container.appendChild(notification);
+  
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    notification.classList.add('fade-out');
+    setTimeout(() => {
+      container.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
 
 // Login functionality
 function initLogin() {
